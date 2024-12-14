@@ -1,22 +1,36 @@
 import { invoke } from "@tauri-apps/api/core";
 
-let greetInputEl: HTMLInputElement | null;
-let greetMsgEl: HTMLElement | null;
-
-async function greet() {
-  if (greetMsgEl && greetInputEl) {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    greetMsgEl.textContent = await invoke("greet", {
-      name: greetInputEl.value,
-    });
-  }
+function handleError(err: string) {
+    let el = document.querySelector("#errors");
+    if (el) {
+        el.innerHTML += `<p>${err}</p>`;
+    }
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  greetInputEl = document.querySelector("#greet-input");
-  greetMsgEl = document.querySelector("#greet-msg");
-  document.querySelector("#greet-form")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    greet();
-  });
+    document.querySelector("#panics")?.addEventListener("click", () => {
+        invoke("panics");
+    });
+
+    document.querySelector("#panics-async")?.addEventListener("click", () => {
+        invoke("panics_async");
+    });
+
+    document
+        .querySelector("#error-as-string")
+        ?.addEventListener("click", () => {
+            invoke("error_as_string").catch(handleError);
+        });
+
+    document
+        .querySelector("#thiserror")
+        ?.addEventListener("click", () => {
+            invoke("using_thiserror").catch(handleError);
+        });
+
+    document
+        .querySelector("#anyhow")
+        ?.addEventListener("click", () => {
+            invoke("using_thiserror_and_anyhow").catch(handleError);
+        });
 });
