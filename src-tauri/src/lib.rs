@@ -2,10 +2,6 @@ use using_anyhow::using_anyhow;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    rust_error_handling::errors();
-
-    let anyhow_result = using_anyhow();
-
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
@@ -15,6 +11,14 @@ pub fn run() {
             using_thiserror::using_thiserror,
             using_thiserror::using_thiserror_and_anyhow,
         ])
+        .setup(|app| {
+            rust_error_handling::errors();
+
+            let anyhow_result = using_anyhow();
+            // match or unwrap...
+
+            Ok(())
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -44,7 +48,7 @@ mod rust_error_handling {
     fn basic_handling_with_match() {
         match open_file() {
             Ok(file) => {
-                println!("all is good");
+                println!("carry on");
             }
             Err(e) => {
                 println!("handling the error: {e}");
@@ -74,7 +78,9 @@ mod using_anyhow {
     use std::fs::File;
     use std::io::{BufReader, Read};
 
-    pub fn using_anyhow() -> anyhow::Result<HashMap<String, serde_json::Value>> {
+    type Json = HashMap<String, serde_json::Value>;
+
+    pub fn using_anyhow() -> anyhow::Result<Json> {
         let json_file = File::open("/some/path/file.json")?;
         let reader = BufReader::new(json_file);
 
@@ -128,9 +134,6 @@ mod using_thiserror {
     pub enum MyCustomError {
         #[error(transparent)]
         File(#[from] io::Error),
-
-        #[error("error opening {1}: {0}")]
-        BetterFile(io::Error, &'static str),
 
         #[error(transparent)]
         Other(#[from] anyhow::Error),
