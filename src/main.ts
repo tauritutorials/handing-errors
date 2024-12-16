@@ -13,7 +13,11 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     document.querySelector("#panics-async")?.addEventListener("click", () => {
-        invoke("panics_async");
+        let promise = invoke("panics_async");
+
+        setInterval(() => {
+            console.log(promise);
+        }, 1000);
     });
 
     document

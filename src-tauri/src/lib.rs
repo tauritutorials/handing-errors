@@ -136,7 +136,7 @@ mod using_thiserror {
         File(#[from] io::Error),
 
         #[error(transparent)]
-        Other(#[from] anyhow::Error),
+        Anyhow(#[from] anyhow::Error),
     }
 
     // we must manually implement serde::Serialize
