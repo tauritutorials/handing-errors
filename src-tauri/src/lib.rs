@@ -155,7 +155,10 @@ mod using_thiserror {
 
     #[tauri::command]
     pub fn using_thiserror_and_anyhow() -> Result<(), MyCustomError> {
+        // an anyhow error
         let err = anyhow::anyhow!("Whoah");
+
+        // .into() our custom error
         Err(err.into())
     }
 }
